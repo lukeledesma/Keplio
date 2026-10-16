@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Keplio</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="rules.js"></script>
+    <script defer src="storage.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <div id="kpi-concept" aria-label="Keplio">
+      <div class="sub">
+        <h2></h2>
+        <div class="date-tools">
+          <span class="muted"></span><span class="muted" id="kt-quarter"></span
+          ><button
+            id="kt-add"
+            class="icon-button"
+            aria-label="Add KPI"
+            title="Add KPI"
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <dialog class="popup" id="kt-popup" aria-labelledby="kt-form-title">
+        <form class="editor" id="kt-editor">
+          <div class="popup-head">
+            <div class="editor-title">
+              <h3 id="kt-form-title">Edit KPI</h3>
+              <button
+                type="button"
+                class="history-button"
+                id="kt-undo"
+                aria-label="Undo edit"
+                title="Undo"
+                disabled
+              >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M9 13 4 8l5-5M4 8h10a6 6 0 0 1 0 12h-2" />
+                </svg></button
+              ><button
+                type="button"
+                class="history-button"
+                id="kt-redo"
+                aria-label="Redo edit"
+                title="Redo"
+                disabled
+              >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="m15 13 5-5-5-5M20 8H10a6 6 0 0 0 0 12h2" />
+                </svg>
+              </button>
+            </div>
+            <button type="button" id="kt-close" aria-label="Close editor">
+              Close
+            </button>
+          </div>
+          <div class="popup-workspace">
+            <div>
+              <div class="formgrid">
+                <label class="name"
+                  >Name<input
+                    id="kt-name"
+                    required
+                    maxlength="100"
+                    placeholder="e.g. Customer follow-ups" /></label
+                ><label
+                  >Period<span class="select-shell"
+                    ><select id="kt-period">
+                      <option value="day">Daily</option>
+                      <option value="week">Weekly</option>
+                      <option value="month">Monthly</option>
+                      <option value="quarter">Quarterly</option>
+                    </select></span
+                  ></label
+                ><label id="kt-target-wrap"
+                  ><span id="kt-target-label">Target</span
+                  ><input
+                    id="kt-target"
+                    type="number"
+                    value="1"
+                    min="1"
+                    max="30"
+                    required /></label
+                ><label
+                  >Layout<span class="select-shell"
+                    ><select id="kt-layout">
+                      <option value="rows">Target rows</option>
+                      <option value="calendar">Calendar</option>
+                    </select></span
+                  ><span
+                    id="kt-layout-value"
+                    class="static-value"
+                    hidden
+                  ></span></label
+                ><label id="kt-schedule-wrap"
+                  >Schedule<span class="select-shell"
+                    ><select id="kt-schedule">
+                      <option value="weekdays">Weekdays</option>
+                      <option value="every">Every day</option>
+                    </select></span
+                  ></label
+                ><label
+                  >Deadline<span class="select-shell"
+                    ><select id="kt-deadline">
+                      <option value="end">End of day</option>
+                      <option value="next">Next day, 8 AM</option>
+                    </select></span
+                  ><span
+                    id="kt-deadline-value"
+                    class="static-value"
+                    hidden
+                  ></span></label
+                ><label class="full"
+                  >Description<textarea
+                    id="kt-description"
+                    maxlength="4000"
+                    rows="2"
+                    placeholder="What counts as a completion?"
+                  ></textarea>
+                </label>
+              </div>
+              <p class="rule" id="kt-rule"></p>
+            </div>
+            <div class="preview-column">
+              <div class="live">
+                <div class="preview-label">Live preview</div>
+                <div id="kt-preview"></div>
+                <p class="preview-description" id="kt-preview-description"></p>
+              </div>
+              <p class="preview-note" id="kt-preview-deadline"></p>
+            </div>
+          </div>
+          <div class="actions">
+            <button type="button" class="danger" id="kt-remove">
+              Remove KPI</button
+            ><button type="button" id="kt-cancel">Cancel</button
+            ><button class="solid" type="submit">Save KPI</button>
+          </div>
+        </form>
+      </dialog>
+      <dialog
+        class="delete-dialog"
+        id="kt-delete-dialog"
+        aria-labelledby="kt-delete-title"
+        aria-describedby="kt-delete-message"
+      >
+        <form method="dialog">
+          <h3 id="kt-delete-title">Delete KPI?</h3>
+          <p id="kt-delete-message"></p>
+          <div class="delete-actions">
+            <button value="cancel" autofocus>Cancel</button>
+            <button value="delete" class="delete-confirm">Delete KPI</button>
+          </div>
+        </form>
+      </dialog>
+      <div class="grid" id="kt-panels"></div>
+      <footer class="foot">
+        <div class="legend">
+          <span><i class="swatch"></i>Pending</span
+          ><span><i class="swatch" style="background: #252d35"></i>Weekend</span
+          ><span
+            ><i class="swatch" style="background: var(--green)"></i>Done</span
+          ><span
+            ><i class="swatch" style="background: var(--red)"></i>Missed</span
+          >
+        </div>
+      </footer>
+      <div class="toast" id="kt-status" aria-live="polite"></div>
+    </div>
+  </body>
+</html>
